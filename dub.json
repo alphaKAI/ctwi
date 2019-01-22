@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"Akihiro Shoji"
+	],
+	"copyright": "Copyright (C) 2019, Akihiro Shoji",
+	"dependencies": {
+		"twitter4d": "~>0.0.70"
+	},
+	"description": "Command line tweet tool",
+	"license": "MIT",
+	"name": "ctwi"
+}
