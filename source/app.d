@@ -72,11 +72,13 @@ void main(string[] args) {
   auto pid = spawnProcess([editor, "%s".format(file_path)]);
   wait(pid);
 
-  string tweet_elem = readText(file_path);
+  if (exists(file_path)) {
+    string tweet_elem = readText(file_path);
 
-  remove(file_path);
+    remove(file_path);
 
-  auto t4d = new Twitter4D(sf.accounts[specified_account]);
+    auto t4d = new Twitter4D(sf.accounts[specified_account]);
 
-  t4d.request("POST", "statuses/update.json", ["status" : tweet_elem]);
+    t4d.request("POST", "statuses/update.json", ["status" : tweet_elem]);
+  }
 }
