@@ -45,6 +45,11 @@ Then,
 $ ./ctwi
 ```
 
+## Useful Options
+
+- --acount some_account or -a some_account : use some_account instead of default_account
+- --in_reply tweet_id or -i tweet_id : you can reply to a tweet with specifying tweet_id of the tweet. @screen_name of target is  automatically complemented.
+
 ## LICENSE
 ctwi is released under the MIT License.  
 Copyright (C) 2019, Akihiro Shoji

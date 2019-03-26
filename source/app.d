@@ -47,9 +47,11 @@ SettingFile readSettingFile(string path) {
 void main(string[] args) {
   string editor;
   string specified_account;
+  string in_reply_to_status_id;
 
   auto helpInformation = getopt(args, "editor|e", "specify the editor",
-      &editor, "account|a", "specify the account to tweet", &specified_account);
+      &editor, "account|a", "specify the account to tweet",
+      &specified_account, "in_reply|i", "specify in_reply_to_status_id", &in_reply_to_status_id);
   if (helpInformation.helpWanted) {
     defaultGetoptPrinter("Usage:", helpInformation.options);
     return;
@@ -121,6 +123,25 @@ void main(string[] args) {
 
     auto t4d = new Twitter4D(sf.accounts[specified_account]);
 
-    t4d.request("POST", "statuses/update.json", ["status": tweet_elem]);
+    if (in_reply_to_status_id is null) {
+      t4d.request("POST", "statuses/update.json", ["status": tweet_elem]);
+    } else {
+      auto parsed = parseJSON(t4d.request("GET",
+          "statuses/show/%s.json".format(in_reply_to_status_id)));
+
+      if ("user" in parsed.object) {
+        string replay_target_screen_name = "@%s".format(
+            parsed.object["user"].object["screen_name"].str);
+
+        tweet_elem = "%s %s".format(replay_target_screen_name, tweet_elem);
+
+        t4d.request("POST", "statuses/update.json", [
+            "status": tweet_elem,
+            "in_reply_to_status_id": in_reply_to_status_id
+            ]);
+      } else {
+        throw new Exception("Given Invalid JSON");
+      }
+    }
   }
 }
