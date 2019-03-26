@@ -58,10 +58,11 @@ void main(string[] args) {
   }
 
   string setting_file_path;
+  auto xdg_config_home = environment.get("XDG_CONFIG_HOME") ~ "/ctwi";
   enum alphakai_dir = "~/.myscripts/ctwi";
   enum default_dir = "~/.config/ctwi";
   string setting_file_name = "setting.json";
-  static immutable setting_file_search_dirs = [default_dir, alphakai_dir];
+  immutable setting_file_search_dirs = [xdg_config_home, default_dir, alphakai_dir];
   string dir;
   foreach (_dir; setting_file_search_dirs) {
     immutable path = expandTilde("%s/%s".format(_dir, setting_file_name));
