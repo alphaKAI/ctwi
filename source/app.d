@@ -55,9 +55,51 @@ void main(string[] args) {
     return;
   }
 
-  string dir = expandTilde("~/.myscripts/ctwi");
+  string setting_file_path;
+  enum alphakai_dir = "~/.myscripts/ctwi";
+  enum default_dir = "~/.config/ctwi";
   string setting_file_name = "setting.json";
-  SettingFile sf = readSettingFile("%s/%s".format(dir, setting_file_name));
+  static immutable setting_file_search_dirs = [default_dir, alphakai_dir];
+  string dir;
+  foreach (_dir; setting_file_search_dirs) {
+    immutable path = expandTilde("%s/%s".format(_dir, setting_file_name));
+    if (path.exists) {
+      setting_file_path = path;
+      dir = expandTilde(_dir);
+    }
+  }
+
+  if (setting_file_path is null) {
+    if (!expandTilde(default_dir)) {
+      mkdir(expandTilde(default_dir));
+    }
+    string default_json = `{
+  "editor": "your favorite editor",
+  "default_account" : "ACCOUNT_NAME1",
+  "accounts" : {
+    "ACCOUNT_NAME1": {
+      "consumerKey"       : "Your consumer key for ACCOUNT_NAME1",
+      "consumerSecret"    : "Your consumer secret for ACCOUNT_NAME1",
+      "accessToken"       : "Your access token for ACCOUNT_NAME1",
+      "accessTokenSecret" : "Your access token secret for ACCOUNT_NAME1"
+    },
+    "ACCOUNT_NAME2" : {
+      "consumerKey"       : "Your consumer key for ACCOUNT_NAME2",
+      "consumerSecret"    : "Your consumer secret for ACCOUNT_NAME2",
+      "accessToken"       : "Your access token for ACCOUNT_NAME2",
+      "accessTokenSecret" : "Your access token secret for ACCOUNT_NAME2"
+    }
+  }
+}`;
+    setting_file_path = "%s/%s".format(default_dir, setting_file_name).expandTilde;
+    File(setting_file_path, "w").write(default_json);
+
+    writeln("Created dummy setting json file at %s", setting_file_path);
+    writeln("Please configure it before use.");
+    return;
+  }
+
+  SettingFile sf = readSettingFile(setting_file_path);
 
   if (editor is null) {
     editor = sf.editor;
@@ -79,6 +121,6 @@ void main(string[] args) {
 
     auto t4d = new Twitter4D(sf.accounts[specified_account]);
 
-    t4d.request("POST", "statuses/update.json", ["status" : tweet_elem]);
+    t4d.request("POST", "statuses/update.json", ["status": tweet_elem]);
   }
 }
