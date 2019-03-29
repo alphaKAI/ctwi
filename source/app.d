@@ -52,13 +52,22 @@ void main(string[] args) {
   string retweet;
   string fav_and_retweet;
   bool no_tweet;
+  string follow;
+  string remove;
 
-  auto helpInformation = getopt(args, "editor|e", "specify the editor",
-      &editor, "account|a", "specify the account to tweet", &specified_account,
+  // dfmt off
+  auto helpInformation = getopt(args,
+      "editor|e", "specify the editor", &editor,
+      "account|a", "specify the account to tweet", &specified_account,
       "in_reply|i", "specify in_reply_to_status_id", &in_reply_to_status_id,
-      "favorite|f", "favorite a tweet", &favorite, "retweet|r", "retweet a tweet", &retweet, "fav_and_rt|fr",
-      "favrote and retweet a tweet", &fav_and_retweet, "no-tweet|n",
-      "don't perform tweeting", &no_tweet);
+      "favorite|f", "favorite a tweet", &favorite,
+      "retweet|r", "retweet a tweet", &retweet,
+      "fav_and_rt|fr", "favrote and retweet a tweet", &fav_and_retweet,
+      "no-tweet|n", "don't perform tweeting", &no_tweet,
+      "follow|fl", "follow the user", &follow,
+      "remove|rm", "unfollow the user", &remove
+      );
+  // dfmt on
   if (helpInformation.helpWanted) {
     defaultGetoptPrinter("Usage:", helpInformation.options);
     return;
@@ -135,6 +144,14 @@ void main(string[] args) {
     t4d.request("POST", "statuses/retweet/%s.json".format(retweet), [
         "id": retweet
         ]);
+  }
+
+  if (follow !is null) {
+    t4d.request("POST", "friendships/create.json", ["screen_name": follow]);
+  }
+
+  if (remove !is null) {
+    t4d.request("POST", "friendships/destroy.json", ["screen_name": remove]);
   }
 
   if (no_tweet) {
