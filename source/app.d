@@ -1,8 +1,9 @@
 import std.stdio;
 import std.process;
-import std.file, std.path, std.json;
+import std.file, std.path, std.json, std.string;
 import std.format, std.getopt, std.typecons;
 import twitter4d;
+import ctwi.util;
 
 struct SettingFile {
   string editor;
@@ -54,6 +55,7 @@ void main(string[] args) {
   bool no_tweet;
   string follow;
   string unfollow;
+  string media_paths;
 
   // dfmt off
   auto helpInformation = getopt(args,
@@ -65,7 +67,8 @@ void main(string[] args) {
       "fav_and_rt|fr", "favrote and retweet a tweet", &fav_and_retweet,
       "no_tweet|n", "don't perform tweeting", &no_tweet,
       "follow|fl", "follow the user", &follow,
-      "unfollow|uf", "unfollow the user", &unfollow
+      "unfollow|uf", "unfollow the user", &unfollow,
+      "media_paths|ms", "attach media paths", &media_paths
       );
   // dfmt on
   if (helpInformation.helpWanted) {
@@ -166,11 +169,37 @@ void main(string[] args) {
 
   if (exists(file_path)) {
     string tweet_elem = readText(file_path);
+    string[] media_ids;
 
     remove(file_path);
 
+    if (media_paths !is null) {
+      string[] paths = media_paths.split;
+
+      foreach (path; paths) {
+        path = expandTilde(path);
+
+        if (!exists(path)) {
+          throw new Exception("no such a file - " ~ path);
+        }
+
+        File f = File(path, "rb");
+        ubyte[] buf;
+        buf.length = f.size;
+        f.rawRead(buf);
+
+        auto ret = t4d.uploadMedia(buf);
+        auto parsed = parseJSON(ret);
+        media_ids ~= parsed.object["media_id_string"].str;
+      }
+    }
+
     if (in_reply_to_status_id is null) {
-      t4d.request("POST", "statuses/update.json", ["status": tweet_elem]);
+      if (media_ids !is null) {
+        t4d.updateWithMedia(tweet_elem, media_ids);
+      } else {
+        t4d.request("POST", "statuses/update.json", ["status": tweet_elem]);
+      }
     } else {
       auto parsed = parseJSON(t4d.request("GET",
           "statuses/show/%s.json".format(in_reply_to_status_id)));
@@ -181,10 +210,15 @@ void main(string[] args) {
 
         tweet_elem = "%s %s".format(replay_target_screen_name, tweet_elem);
 
-        t4d.request("POST", "statuses/update.json", [
-            "status": tweet_elem,
-            "in_reply_to_status_id": in_reply_to_status_id
-            ]);
+        if (media_ids !is null) {
+          t4d.updateWithMedia(tweet_elem, media_ids,
+              ["in_reply_to_status_id": in_reply_to_status_id]);
+        } else {
+          t4d.request("POST", "statuses/update.json", [
+              "status": tweet_elem,
+              "in_reply_to_status_id": in_reply_to_status_id
+              ]);
+        }
       } else {
         throw new Exception("Given Invalid JSON");
       }

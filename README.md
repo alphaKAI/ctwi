@@ -55,6 +55,7 @@ $ ./ctwi
 - --no_tweet or -n : don't perform tweeting (for performing these actions fav, rt, follow, unfollow... without tweet)
 - --follow screen_name or --fl screen_name : follow the user
 - --unfollow screen_name of --uf screen_name : unfollow the user
+- --media_paths paths or --ms paths : attached media paths
 
 ## LICENSE
 ctwi is released under the MIT License.  
