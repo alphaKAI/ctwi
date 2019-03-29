@@ -53,7 +53,7 @@ void main(string[] args) {
   string fav_and_retweet;
   bool no_tweet;
   string follow;
-  string remove;
+  string unfollow;
 
   // dfmt off
   auto helpInformation = getopt(args,
@@ -65,7 +65,7 @@ void main(string[] args) {
       "fav_and_rt|fr", "favrote and retweet a tweet", &fav_and_retweet,
       "no_tweet|n", "don't perform tweeting", &no_tweet,
       "follow|fl", "follow the user", &follow,
-      "remove|rm", "unfollow the user", &remove
+      "unfollow|uf", "unfollow the user", &unfollow
       );
   // dfmt on
   if (helpInformation.helpWanted) {
@@ -150,8 +150,8 @@ void main(string[] args) {
     t4d.request("POST", "friendships/create.json", ["screen_name": follow]);
   }
 
-  if (remove !is null) {
-    t4d.request("POST", "friendships/destroy.json", ["screen_name": remove]);
+  if (unfollow !is null) {
+    t4d.request("POST", "friendships/destroy.json", ["screen_name": unfollow]);
   }
 
   if (no_tweet) {

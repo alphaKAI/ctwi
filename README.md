@@ -51,10 +51,10 @@ $ ./ctwi
 - --in_reply tweet_id or -i tweet_id : you can reply to a tweet with specifying tweet_id of the tweet. @screen_name of target is  automatically complemented.
 - --favorite tweet_id or -f tweet_id : favorite the tweet
 - --retweet tweet_id or -r tweet_id : retweet the tweet
-- --fav_and_rt tweet_id or -fr tweet_id : favorite and retweet the tweet
+- --fav_and_rt tweet_id or --fr tweet_id : favorite and retweet the tweet
 - --no_tweet or -n : don't perform tweeting (for performing these actions fav, rt, follow, unfollow... without tweet)
-- --follow screen_name or -fl screen_name : follow the user
-- --remove screen_name of -rm screen_name : unfollow the user
+- --follow screen_name or --fl screen_name : follow the user
+- --unfollow screen_name of --uf screen_name : unfollow the user
 
 ## LICENSE
 ctwi is released under the MIT License.  
