@@ -48,10 +48,17 @@ void main(string[] args) {
   string editor;
   string specified_account;
   string in_reply_to_status_id;
+  string favorite;
+  string retweet;
+  string fav_and_retweet;
+  bool no_tweet;
 
   auto helpInformation = getopt(args, "editor|e", "specify the editor",
-      &editor, "account|a", "specify the account to tweet",
-      &specified_account, "in_reply|i", "specify in_reply_to_status_id", &in_reply_to_status_id);
+      &editor, "account|a", "specify the account to tweet", &specified_account,
+      "in_reply|i", "specify in_reply_to_status_id", &in_reply_to_status_id,
+      "favorite|f", "favorite a tweet", &favorite, "retweet|r", "retweet a tweet", &retweet, "fav_and_rt|fr",
+      "favrote and retweet a tweet", &fav_and_retweet, "no-tweet|n",
+      "don't perform tweeting", &no_tweet);
   if (helpInformation.helpWanted) {
     defaultGetoptPrinter("Usage:", helpInformation.options);
     return;
@@ -62,7 +69,9 @@ void main(string[] args) {
   enum alphakai_dir = "~/.myscripts/ctwi";
   enum default_dir = "~/.config/ctwi";
   string setting_file_name = "setting.json";
-  immutable setting_file_search_dirs = [xdg_config_home, default_dir, alphakai_dir];
+  immutable setting_file_search_dirs = [
+    xdg_config_home, default_dir, alphakai_dir
+  ];
   string dir;
   foreach (_dir; setting_file_search_dirs) {
     immutable path = expandTilde("%s/%s".format(_dir, setting_file_name));
@@ -111,6 +120,27 @@ void main(string[] args) {
     specified_account = sf.default_account;
   }
 
+  auto t4d = new Twitter4D(sf.accounts[specified_account]);
+
+  if (fav_and_retweet !is null) {
+    favorite = fav_and_retweet;
+    retweet = fav_and_retweet;
+  }
+
+  if (favorite !is null) {
+    t4d.request("POST", "favorites/create.json", ["id": favorite]);
+  }
+
+  if (retweet !is null) {
+    t4d.request("POST", "statuses/retweet/%s.json".format(retweet), [
+        "id": retweet
+        ]);
+  }
+
+  if (no_tweet) {
+    return;
+  }
+
   string file_name = "tmp_tweet_file";
   string file_path = "%s/%s".format(dir, file_name);
 
@@ -121,8 +151,6 @@ void main(string[] args) {
     string tweet_elem = readText(file_path);
 
     remove(file_path);
-
-    auto t4d = new Twitter4D(sf.accounts[specified_account]);
 
     if (in_reply_to_status_id is null) {
       t4d.request("POST", "statuses/update.json", ["status": tweet_elem]);
