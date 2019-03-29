@@ -52,6 +52,7 @@ $ ./ctwi
 - --favorite tweet_id or -f tweet_id : favorite the tweet
 - --retweet tweet_id or -r tweet_id : retweet the tweet
 - --fav_and_rt tweet_id or -fr tweet_id : favorite and retweet the tweet
+- --no_tweet or -n : don't perform tweeting (for performing these actions fav, rt, follow, unfollow... without tweet)
 - --follow screen_name or -fl screen_name : follow the user
 - --remove screen_name of -rm screen_name : unfollow the user
 

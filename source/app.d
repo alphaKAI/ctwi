@@ -63,7 +63,7 @@ void main(string[] args) {
       "favorite|f", "favorite a tweet", &favorite,
       "retweet|r", "retweet a tweet", &retweet,
       "fav_and_rt|fr", "favrote and retweet a tweet", &fav_and_retweet,
-      "no-tweet|n", "don't perform tweeting", &no_tweet,
+      "no_tweet|n", "don't perform tweeting", &no_tweet,
       "follow|fl", "follow the user", &follow,
       "remove|rm", "unfollow the user", &remove
       );
